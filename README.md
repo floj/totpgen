@@ -3,24 +3,62 @@ Utility to generate TOTP tokens
 
 ## Usage
 
-First create the config file `.config/totpgen/config.json` and add entires like
-```
-[
-    {
-        "name": "aws",
-        "secret": "55XX..."
-    },
-    {
-        "name": "github",
-        "secret": "55XX..."
-    }
-]
+The secret tokens are saved in the systems keychain (via [99designs/go-keychain](github.com/99designs/go-keychain)).
+
+To add a totp TOTP secret, run
+```sh
+totpgen set "<secret-name>" "totp-secret"
+# eg
+totpgen set google "SAucYHYJyfma1Fa6uFlBqzUluusgIj1slSwKRoVvhGYZsVCt"
+totpgen set aws "44uHJtA8IwpKy9JjaaprSizgZ2TSImDY8iUPvm1qaDHReOTJ"
 ```
 
-Then invoke `totpgen <name>`. The tool prints out a TOTP token.
+To generate the current OPT code run
+```sh
+totpgen google
+# output:
+123456
+```
 
-You can also create a symlink to the script and name it after `totpgen-<name>` (e.g. `totpgen-aws`).
+You can also create a symlink to the script and name it after `totpgen-<name>` (e.g. `totpgen-google`).
 Invoking the tool like this will also print the TOTP token for the specified name, no arguments required.
+
+```sh
+ln -sT totpgen totp-google
+totp-google
+# output:
+123456
+```
+
+There are a couple more commands:
+```sh
+# show the names of saved totp configuration
+totpgen list
+# output:
+google
+aws
+
+# to remove a secret use the 'set' command with an empty secret
+totpgen set google ""
+```
+
+## Installation
+Via `go install`:
+```sh
+go install github.com/floj/totpgen
+~/go/bin/totpgen --help
+```
+
+Manual
+```sh
+git clone https://github.com/floj/totpgen.git
+cd totogen
+./build.sh
+./totpgen --help
+```
+
+### MacOS
+I don't provide precompiled binaries, because past expirence showed that cross-compiled binaries for Mac do not properly work with the OSX keychain. Thus, if you want to use it on Mac, you need to compile it yourself using one of the above command.
 
 ## Why
 Main motivation was to use it in [aws-vault](https://github.com/99designs/aws-vault). AWS Vault supports creating TOTP tokens via [pass-otp](https://github.com/tadfisher/pass-otp). This is very nice, but limits you to use pass. I created a `scriptotp` (see [scriptotp.go](https://github.com/floj/aws-vault/blob/master/prompt/scriptotp.go)) prompt provider that is able to call whatever script you want. Just point it to `totpgen-aws` by setting `AWS_VAULT_MFA_SCRIPT=totpgen-aws` and you are good to go.

@@ -24,8 +24,8 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:      "set",
-				Usage:     "add or replace a configured secret",
-				UsageText: "totpgen set <secret-name> <secret-token>",
+				Usage:     "Add, replace or remove a configured secret. To remove a secret, set it's secret token to empty.",
+				UsageText: "totpgen set <secret-name> <secret-token>\ntotpgen set <secret-name> ''",
 				Action: func(ctx *cli.Context) error {
 					if ctx.Args().Len() != 2 {
 						cli.ShowSubcommandHelpAndExit(ctx, 1)
@@ -34,9 +34,16 @@ func main() {
 					if err != nil {
 						return err
 					}
+					secret := ctx.Args().Get(1)
+					if secret == "" {
+						if err := ring.Remove(ctx.Args().Get(0)); err != nil {
+							return fmt.Errorf("could not remove secret from keyring: %w", err)
+						}
+					}
+
 					err = ring.Set(keyring.Item{
 						Key:  ctx.Args().Get(0),
-						Data: []byte(ctx.Args().Get(1)),
+						Data: []byte(secret),
 					})
 					if err != nil {
 						return fmt.Errorf("could not insert new secret into keyring: %w", err)
@@ -64,6 +71,33 @@ func main() {
 					return nil
 				},
 			},
+			// better do not offer export for security reasons.
+			// A later version might allow this, but maybe encrypt the secrets with a password or PK.
+			// {
+			// 	Name:      "export",
+			// 	Usage:     "export configured secrets",
+			// 	UsageText: "totpgen export",
+			// 	Action: func(ctx *cli.Context) error {
+			// 		ring, err := openKeyring()
+			// 		if err != nil {
+			// 			return err
+			// 		}
+			// 		kk, err := ring.Keys()
+			// 		if err != nil {
+			// 			return fmt.Errorf("could not list keys from keyring: %w", err)
+			// 		}
+			// 		sort.Strings(kk)
+			// 		for _, k := range kk {
+			// 			e, err := ring.Get(k)
+			// 			if err != nil {
+			// 				return fmt.Errorf("could not get secret for '%s': %w", k, err)
+			// 			}
+			// 			fmt.Printf(`totpgen set "%s" "%s"`, k, e.Data)
+			// 			fmt.Println()
+			// 		}
+			// 		return nil
+			// 	},
+			// },
 		},
 		UsageText: "totpgen <secret-name>\ntotpgen-<secret-name> (eg. symlinked)\ntotpgen command [command options]",
 		ArgsUsage: "<secret name>",

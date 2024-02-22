@@ -11,5 +11,5 @@ require (
 	github.com/pquerna/otp v1.4.0
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/xrash/smetrics v0.0.0-20231213231151-1d8dd44e695e // indirect
-	golang.org/x/term v0.16.0 // indirect
+	golang.org/x/term v0.17.0 // indirect
 )
