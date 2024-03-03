@@ -3,7 +3,7 @@ Utility to generate TOTP tokens
 
 ## Usage
 
-The secret tokens are saved in the systems keychain (via [99designs/go-keychain](github.com/99designs/go-keychain)).
+The secret tokens are saved in the systems keychain (via [99designs/go-keychain](https://github.com/99designs/go-keychain)).
 
 To add a totp TOTP secret, run
 ```sh
@@ -52,7 +52,7 @@ go install github.com/floj/totpgen
 Manual
 ```sh
 git clone https://github.com/floj/totpgen.git
-cd totogen
+cd totpgen
 ./build.sh
 ./totpgen --help
 ```
