@@ -139,7 +139,8 @@ func main() {
 
 func openKeyring() (keyring.Keyring, error) {
 	ring, err := keyring.Open(keyring.Config{
-		ServiceName: ringName,
+		ServiceName:  ringName,
+		KeychainName: os.Getenv("TOTPGEN_KEYCHAIN_NAME"),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("could not open keyring: %w", err)
