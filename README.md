@@ -60,5 +60,12 @@ cd totpgen
 ### MacOS
 I don't provide precompiled binaries, because past expirence showed that cross-compiled binaries for Mac do not properly work with the OSX keychain. Thus, if you want to use it on Mac, you need to compile it yourself using one of the above command.
 
-## Why
+#### Additionally available config options for MacOS
+
+| Environment variable  | Configuration | Example |
+|-----------------------|---------------|---------|
+| `TOTPGEN_KEYCHAIN_NAME` | Name of the Keychain files used | `TOTPGEN_KEYCHAIN_NAME=totpgen-secrets` |
+
+
+## Why?
 Main motivation was to use it in [aws-vault](https://github.com/99designs/aws-vault). AWS Vault supports creating TOTP tokens via [pass-otp](https://github.com/tadfisher/pass-otp). This is very nice, but limits you to use `pass`. I created a `scriptmfa` prompt provider (see [genericscript.go](https://github.com/floj/aws-vault/blob/master/prompt/genericscript.go)) that is able to call whatever script you want. Just point it to `totpgen-aws` by setting `AWS_VAULT_MFA_SCRIPT=totpgen-aws` and you are good to go.
