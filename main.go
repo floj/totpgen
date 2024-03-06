@@ -71,6 +71,17 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:      "backends",
+				Usage:     "show available keyring backends",
+				UsageText: "totpgen backends",
+				Action: func(ctx *cli.Context) error {
+					for _, b := range keyring.AvailableBackends() {
+						fmt.Println(b)
+					}
+					return nil
+				},
+			},
 			// better do not offer export for security reasons.
 			// A later version might allow this, but maybe encrypt the secrets with a password or PK.
 			// {

@@ -40,6 +40,15 @@ aws
 
 # to remove a secret use the 'set' command with an empty secret
 totpgen set google ""
+
+# show available keychain backends
+totpgen backends
+# output
+secret-service
+kwallet
+keyctl
+pass
+file
 ```
 
 ## Installation
