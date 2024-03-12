@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -47,6 +48,46 @@ func main() {
 					})
 					if err != nil {
 						return fmt.Errorf("could not insert new secret into keyring: %w", err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:      "rename",
+				Usage:     "Rename a configured secret.",
+				UsageText: "totpgen rename <secret-name> <new secret-name>",
+				Action: func(ctx *cli.Context) error {
+					if ctx.Args().Len() != 2 {
+						cli.ShowSubcommandHelpAndExit(ctx, 1)
+					}
+
+					ring, err := openKeyring()
+					if err != nil {
+						return err
+					}
+					oldName, newName := ctx.Args().Get(0), ctx.Args().Get(1)
+
+					_, err = ring.Get(newName)
+					if !errors.Is(err, keyring.ErrKeyNotFound) {
+						return fmt.Errorf("secret '%s' already exists", newName)
+					}
+
+					oldSec, err := ring.Get(oldName)
+					if err != nil {
+						return fmt.Errorf("could not get secret for '%s': %w", oldName, err)
+					}
+
+					err = ring.Set(keyring.Item{
+						Key:  newName,
+						Data: oldSec.Data,
+					})
+					if err != nil {
+						return fmt.Errorf("could not insert new secret '%s' into keyring: %w", newName, err)
+					}
+
+					err = ring.Remove(oldName)
+					if err != nil {
+						return fmt.Errorf("could not remove old secret '%s' from keyring: %w", oldName, err)
 					}
 					return nil
 				},
@@ -128,12 +169,12 @@ func main() {
 			if err != nil {
 				return err
 			}
-			e, err := ring.Get(secName)
+			entry, err := ring.Get(secName)
 			if err != nil {
 				return fmt.Errorf("could not get secret for '%s': %w", secName, err)
 			}
 
-			token, err := totp.GenerateCode(string(e.Data), time.Now())
+			token, err := totp.GenerateCode(string(entry.Data), time.Now())
 			if err != nil {
 				return fmt.Errorf("could not generate totp code for '%s': %w", secName, err)
 			}
