@@ -41,6 +41,9 @@ aws
 # to remove a secret use the 'set' command with an empty secret
 totpgen set google ""
 
+# rename a secret
+totpgen rename google google-dev
+
 # show available keychain backends
 totpgen backends
 # output
